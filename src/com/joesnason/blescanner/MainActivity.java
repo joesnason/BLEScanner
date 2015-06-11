@@ -147,6 +147,7 @@ public class MainActivity extends ActionBarActivity {
             boolean patternFound = false;
             String uuid = null;
             int major = 0 , minor = 0;
+            int Txpower = 0;
 
             /* Because advertisement packet
                 | 0x02 | 0x15     | - - - - - - - - - - - - - - - - - - - | - - - - | - - - - | - - - - |
@@ -180,11 +181,18 @@ public class MainActivity extends ActionBarActivity {
 
                 //Here is your Minor value
                 minor = (scanRecord[startByte+22] & 0xff) * 0x100 + (scanRecord[startByte+23] & 0xff);
+
+                Txpower = scanRecord[startByte+ 24];
             }
 
-            Log.d("jojo", "Device name" + device.getName() + " UUID: " + uuid + "  Major: " + major + " Minor: " + minor);
+            Beacon beacon = new Beacon(uuid,device.getName(),major,minor,rssi);
 
-            String item = "Device name" + device.getName() + "\nUUID: " + uuid + "\nMajor: " + major + "\nMinor: " + minor;
+            Log.d("jojo", "Device name: " + beacon.getName() + " UUID: " + beacon.getUUID() + "  Major: " + beacon.getMajor() + " Minor: " + beacon.getMinor() + " rssi: " + beacon.getRssi() + " power: " + Txpower);
+
+            String item = "Device name: " + beacon.getName() + "\nUUID: " + beacon.getUUID() + "\nMajor: " + beacon.getMajor() + "\nMinor: " + beacon.getMinor() + "\nrssi: " + rssi;
+
+            double Distance = calucateDistance(rssi,Txpower);
+            Log.d("jojo", "Distance: " + Distance);
 
 
             if (!listItems.contains(item)){
@@ -192,6 +200,20 @@ public class MainActivity extends ActionBarActivity {
                 //mAdapter.add(item);
                 mAdapter.notifyDataSetChanged();
             }
+        }
+
+
+        private double calucateDistance(int rssi, int TxPower){
+
+
+            double ratio = ((float)rssi) / TxPower;
+            Log.d("jojojojo","ratio: " + ratio);
+            // less than Txpower,  it mean the Beacon in  ONE Miles range. the distance and rssi are linear relationship.
+            if(ratio < 1.0){
+                return Math.pow(ratio, 10);
+            }
+
+            return 0.89976 * Math.pow(ratio, 7.7095) + 0.111;
         }
     };
 
