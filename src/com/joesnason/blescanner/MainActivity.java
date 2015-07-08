@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -28,6 +29,48 @@ public class MainActivity extends ActionBarActivity {
 
     ArrayAdapter<String> mAdapter;
     ArrayList<String> listItems=new ArrayList<String>();
+
+
+    private Handler scanhandler = null;
+
+    final Runnable scanRunable  = new Runnable() {
+        @Override
+        public void run() {
+
+            if (!mBluetoothAdapter.isEnabled() ) {
+
+                Intent mIntentOpenBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+
+                startActivityForResult(mIntentOpenBT, REQUEST_ENABLE_BT);
+
+                Log.d("jojo", "enable Bluetooth");
+
+            } else {
+                //mBluetoothAdapter.stopLeScan(mLeScanCallback);
+
+                mBluetoothAdapter.startLeScan(mLeScanCallback);
+
+                Log.d("jojo", "start Le scan");
+
+            }
+            scanhandler.postDelayed(stopscanRunable,1000);
+
+
+        }
+    };
+
+    final Runnable stopscanRunable = new Runnable() {
+        @Override
+        public void run() {
+            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            listItems.clear();
+
+            scanhandler.postDelayed(scanRunable, 1000);
+        }
+
+    };
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +96,8 @@ public class MainActivity extends ActionBarActivity {
 
         mListView.setAdapter(mAdapter);
 
+        scanhandler = new Handler();
+
 
     }
 
@@ -62,22 +107,8 @@ public class MainActivity extends ActionBarActivity {
         super.onResume();
 
         Log.d("jojo", "onResume start");
-        if (!mBluetoothAdapter.isEnabled() ) {
 
-            Intent mIntentOpenBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-
-            startActivityForResult(mIntentOpenBT, REQUEST_ENABLE_BT);
-
-            Log.d("jojo", "enable Bluetooth");
-
-        } else {
-
-            mBluetoothAdapter.startLeScan(mLeScanCallback);
-
-            Log.d("jojo", "start Le scan");
-
-        }
-
+        scanhandler.post(scanRunable);
 
 
     }
@@ -142,7 +173,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
 
-
+            Log.d("jojo","enter Scan callback");
             int startByte = 2;
             boolean patternFound = false;
             String uuid = null;
@@ -215,6 +246,8 @@ public class MainActivity extends ActionBarActivity {
 
             return 0.89976 * Math.pow(ratio, 7.7095) + 0.111;
         }
+
+
     };
 
 
