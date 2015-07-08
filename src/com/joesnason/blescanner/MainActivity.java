@@ -22,6 +22,8 @@ import java.util.ArrayList;
 public class MainActivity extends Activity {
 
 
+    private static String TAG = "BLEScanner";
+
     private BluetoothAdapter mBluetoothAdapter;
     private final int REQUEST_ENABLE_BT = 1;
 
@@ -43,14 +45,12 @@ public class MainActivity extends Activity {
 
                 startActivityForResult(mIntentOpenBT, REQUEST_ENABLE_BT);
 
-                Log.d("jojo", "enable Bluetooth");
+                Log.d(TAG, "enable Bluetooth");
 
             } else {
-                //mBluetoothAdapter.stopLeScan(mLeScanCallback);
-
                 mBluetoothAdapter.startLeScan(mLeScanCallback);
 
-                Log.d("jojo", "start Le scan");
+                Log.d(TAG, "start Le scan");
 
             }
             scanhandler.postDelayed(stopscanRunable,1000);
@@ -75,7 +75,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("jojo", "onCreate start");
+        Log.d(TAG, "onCreate start");
         setContentView(R.layout.activity_main);
 
         final BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
@@ -106,7 +106,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        Log.d("jojo", "onResume start");
+        Log.d(TAG, "onResume start");
 
         scanhandler.post(scanRunable);
 
@@ -119,7 +119,7 @@ public class MainActivity extends Activity {
 
         if(requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK){
             mBluetoothAdapter.startLeScan(mLeScanCallback);
-                Log.d("jojo", "start scan");
+                Log.d(TAG, "start scan");
         }
     }
 
@@ -161,7 +161,7 @@ public class MainActivity extends Activity {
                 // 取得藍芽裝置
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                Log.d("jojo", "device name: " + device.getName());
+                Log.d(TAG, "device name: " + device.getName());
 
 
             }
@@ -173,7 +173,7 @@ public class MainActivity extends Activity {
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
 
-            Log.d("jojo","enter Scan callback");
+            Log.d(TAG,"enter Scan callback");
             int startByte = 2;
             boolean patternFound = false;
             String uuid = null;
@@ -218,12 +218,12 @@ public class MainActivity extends Activity {
 
             Beacon beacon = new Beacon(uuid,device.getName(),major,minor,rssi);
 
-            Log.d("jojo", "Device name: " + beacon.getName() + " UUID: " + beacon.getUUID() + "  Major: " + beacon.getMajor() + " Minor: " + beacon.getMinor() + " rssi: " + beacon.getRssi() + " power: " + Txpower);
+            Log.d(TAG, "Device name: " + beacon.getName() + " UUID: " + beacon.getUUID() + "  Major: " + beacon.getMajor() + " Minor: " + beacon.getMinor() + " rssi: " + beacon.getRssi() + " power: " + Txpower);
 
             String item = "Device name: " + beacon.getName() + "\nUUID: " + beacon.getUUID() + "\nMajor: " + beacon.getMajor() + "\nMinor: " + beacon.getMinor() + "\nrssi: " + rssi;
 
             double Distance = calucateDistance(rssi,Txpower);
-            Log.d("jojo", "Distance: " + Distance);
+            Log.d(TAG, "Distance: " + Distance);
 
 
             if (!listItems.contains(item)){
@@ -238,7 +238,7 @@ public class MainActivity extends Activity {
 
 
             double ratio = ((float)rssi) / TxPower;
-            Log.d("jojojojo","ratio: " + ratio);
+            Log.d(TAG,"ratio: " + ratio);
             // less than Txpower,  it mean the Beacon in  ONE Miles range. the distance and rssi are linear relationship.
             if(ratio < 1.0){
                 return Math.pow(ratio, 10);
