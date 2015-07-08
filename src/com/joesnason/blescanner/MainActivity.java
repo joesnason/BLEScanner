@@ -127,6 +127,8 @@ public class MainActivity extends Activity {
     protected void onPause() {
         super.onPause();
 
+        scanhandler.removeCallbacks(scanRunable);
+        scanhandler.removeCallbacks(stopscanRunable);
 
         mBluetoothAdapter.stopLeScan(mLeScanCallback);
     }
