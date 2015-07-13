@@ -1,0 +1,24 @@
+
+# Generated files #
+*.pyc
+*.specs
+*.cm*
+*.o
+*~
+*.swp
+*.annot
+*.class
+*.log
+*.orig
+*.rej
+
+
+# OS X temporary files
+*.xccheckout 
+.DS_Store
+*.lock
+
+
+# IntelliJ files
+.idea
+*.iml
