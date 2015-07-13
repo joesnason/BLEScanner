@@ -206,7 +206,6 @@ public class MainActivity extends Activity {
                 String hexString = Util.bytesToHex(uuidBytes);
 
                 //Here is your UUID
-
                 uuid = String.format("%s-%s-%s-%s-%s",hexString.substring(0,8),hexString.substring(8,12),hexString.substring(12,16),hexString.substring(16,20),hexString.substring(20,32));
 
                 //Here is your Major value
@@ -224,7 +223,7 @@ public class MainActivity extends Activity {
 
             String item = "Device name: " + beacon.getName() + "\nUUID: " + beacon.getUUID() + "\nMajor: " + beacon.getMajor() + "\nMinor: " + beacon.getMinor() + "\nrssi: " + rssi;
 
-            double Distance = calucateDistance(rssi,Txpower);
+            double Distance = Util.calucateDistance(rssi,Txpower);
             Log.d(TAG, "Distance: " + Distance);
 
 
@@ -234,21 +233,6 @@ public class MainActivity extends Activity {
                 mAdapter.notifyDataSetChanged();
             }
         }
-
-
-        private double calucateDistance(int rssi, int TxPower){
-
-
-            double ratio = ((float)rssi) / TxPower;
-            Log.d(TAG,"ratio: " + ratio);
-            // less than Txpower,  it mean the Beacon in  ONE Miles range. the distance and rssi are linear relationship.
-            if(ratio < 1.0){
-                return Math.pow(ratio, 10);
-            }
-
-            return 0.89976 * Math.pow(ratio, 7.7095) + 0.111;
-        }
-
 
     };
 

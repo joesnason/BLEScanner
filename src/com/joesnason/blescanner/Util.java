@@ -23,4 +23,17 @@ public class Util {
         }
         return new String(hexChars);
     }
+
+
+    public static double calucateDistance(int rssi, int TxPower){
+
+
+        double ratio = ((float)rssi) / TxPower;
+        // less than Txpower,  it mean the Beacon in  ONE Miles range. the distance and rssi are linear relationship.
+        if(ratio < 1.0){
+            return Math.pow(ratio, 10);
+        }
+        return 0.89976 * Math.pow(ratio, 7.7095) + 0.111;
+    }
+
 }
