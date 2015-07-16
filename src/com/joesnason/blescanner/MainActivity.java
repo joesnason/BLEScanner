@@ -12,11 +12,13 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 
 public class MainActivity extends Activity {
@@ -29,11 +31,14 @@ public class MainActivity extends Activity {
 
     private ListView mListView;
 
-    ArrayAdapter<String> mAdapter;
-    ArrayList<String> listItems=new ArrayList<String>();
+    private SimpleAdapter mAdapter;
+
+    ArrayList<HashMap<String, String>> listitems = new ArrayList<HashMap<String, String>>();
 
 
     private Handler scanhandler = null;
+
+    final String KEY_BEACON_ID = "ID", KEY_RSSI = "RSSI";
 
     final Runnable scanRunable  = new Runnable() {
         @Override
@@ -63,7 +68,8 @@ public class MainActivity extends Activity {
         @Override
         public void run() {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
-            listItems.clear();
+            //listItems.clear();
+            //listitem2.clear();
 
             scanhandler.postDelayed(scanRunable, 1000);
         }
@@ -90,9 +96,18 @@ public class MainActivity extends Activity {
 
 
 
-        mAdapter=new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1,
-                listItems);
+//        mAdapter=new ArrayAdapter<String>(this,
+//                android.R.layout.simple_list_item_1,
+//                listItems);
+
+
+        mAdapter = new SimpleAdapter(
+                this,
+                listitems,
+                android.R.layout.simple_list_item_2,
+                new String[] { KEY_BEACON_ID, KEY_RSSI },
+                new int[] { android.R.id.text1, android.R.id.text2 } );
+
 
         mListView.setAdapter(mAdapter);
 
@@ -221,17 +236,44 @@ public class MainActivity extends Activity {
 
             Log.d(TAG, "Device name: " + beacon.getName() + " UUID: " + beacon.getUUID() + "  Major: " + beacon.getMajor() + " Minor: " + beacon.getMinor() + " rssi: " + beacon.getRssi() + " power: " + Txpower);
 
-            String item = "Device name: " + beacon.getName() + "\nUUID: " + beacon.getUUID() + "\nMajor: " + beacon.getMajor() + "\nMinor: " + beacon.getMinor() + "\nrssi: " + rssi;
+
+            String ID_item = "Device name: " + beacon.getName() + "\nUUID: " + beacon.getUUID() + "\nMajor: " + beacon.getMajor() + "\nMinor: " + beacon.getMinor();
+
+            String RSSI_item = "rssi: " + rssi;
+
+            HashMap<String,String> hashitem = new HashMap<String,String>();
+
+            hashitem.put(KEY_BEACON_ID, ID_item);
+            hashitem.put(KEY_RSSI, RSSI_item);
 
             double Distance = Util.calucateDistance(rssi,Txpower);
             Log.d(TAG, "Distance: " + Distance);
 
 
-            if (!listItems.contains(item)){
-                listItems.add(item);
-                //mAdapter.add(item);
-                mAdapter.notifyDataSetChanged();
+            if (listitems == null) {
+                listitems.add(hashitem);
+            } else {
+
+                // check if listtime had have item, then update the rssi.
+                Iterator it = listitems.iterator();
+                HashMap savevalue = null;
+
+                boolean getValue = false;
+                while (it.hasNext()){
+                    savevalue=(HashMap<String, String>) it.next();
+                    if (savevalue.get(KEY_BEACON_ID).equals(ID_item)){
+                        savevalue.put(KEY_RSSI,RSSI_item);
+                        Log.d(TAG, "update " + ID_item + " rssi: " + RSSI_item);
+                        getValue = true;
+                    }
+                }
+                if (!getValue) {
+                    listitems.add(hashitem);
+                }
+
             }
+            mAdapter.notifyDataSetChanged();
+
         }
 
     };
