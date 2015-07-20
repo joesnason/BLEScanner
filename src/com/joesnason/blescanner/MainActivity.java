@@ -68,8 +68,6 @@ public class MainActivity extends Activity {
         @Override
         public void run() {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
-            //listItems.clear();
-            //listitem2.clear();
 
             scanhandler.postDelayed(scanRunable, 1000);
         }
@@ -93,12 +91,6 @@ public class MainActivity extends Activity {
         }
 
         mListView = (ListView) findViewById(R.id.listview);
-
-
-
-//        mAdapter=new ArrayAdapter<String>(this,
-//                android.R.layout.simple_list_item_1,
-//                listItems);
 
 
         mAdapter = new SimpleAdapter(
@@ -175,7 +167,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
 
-                // 取得藍芽裝置
+                // get bluetooth device
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
                 Log.d(TAG, "device name: " + device.getName());
